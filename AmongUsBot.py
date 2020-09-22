@@ -36,6 +36,13 @@ class AmongUsBot(discord.Client):
 		self.pm = pm
 		self.addr_base = addr_base
 	
+	def GetOwner(self):
+		for guild in self.guilds:
+			member = guild.get_member(DISCORD_USER_OWNER)
+			if member != None:
+				return member
+		return None
+	
 	async def mute_one(self, member):
 		if member.voice != None:
 			await member.edit(mute=True)
@@ -85,9 +92,9 @@ class AmongUsBot(discord.Client):
 	
 	async def on_ready(self):
 		print('Logged on as {0}!'.format(self.user))
-		self.owner = self.get_user(DISCORD_USER_OWNER)
-		self.owner_channel = None
-		self.vc_member_list = []
+		owner = self.GetOwner()
+		self.owner_channel = owner.voice.channel if owner.voice != None else None
+		self.vc_member_list = self.owner_channel.members if self.owner_channel != None else None
 		self.should_talk_previous = False
 		self.should_talk = False
 		self.mute_everybody_task = None
